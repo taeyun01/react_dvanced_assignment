@@ -1,19 +1,21 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import ExpensesItem from "./ExpensesItem";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  displayExpense,
-  totalMonthExpense,
-} from "../redux/slices/expensesSlice";
 import Margin from "./Margin";
+import ExpensesItem from "./ExpensesItem";
+import useApiQuery from "../hooks/useApiQuery";
+import { totalMonthExpense } from "../redux/slices/expensesSlice";
+import useLoadingError from "../hooks/useLoadingError";
 
 const ExpensesList = () => {
   const [sortType, setSortType] = useState("latest");
+  const { totalMonth } = useSelector((state) => state.expenses);
 
-  const { expenses, totalMonth } = useSelector(
-    (state) => state.expenses
-  );
+  const {
+    data: expenses,
+    isPending: isFetchingExpenses,
+    isError: isErrorExpenses,
+  } = useApiQuery("expenses", "/expenses");
 
   const dispatch = useDispatch();
 
@@ -23,23 +25,22 @@ const ExpensesList = () => {
   if (Number(monthNumber) < 10) {
     monthNumber = `0${monthNumber}`;
   } else {
-    monthNumber = monthNumber;
+    monthNumber = `${monthNumber}`;
   }
 
   // 내가 선택한 N월 필터
-  const monthFilter = expenses.filter(
+  const monthFilter = expenses?.filter(
     (mon) => mon.date.substring(5, 7) === String(monthNumber)
   );
 
   const getfilteredData = () => {
     // N 월 지출 총 합계
     const totalExpenses = monthFilter
-      .map((exp) => Number(exp.amount))
+      ?.map((exp) => Number(exp.amount))
       .reduce((acc, cur) => acc + cur, 0);
 
-    // 날짜 비교하여 최신순, 오래된순으로 정렬
-    // toSorted는 sort메서드랑 다르게 원본 배열은 보존하고 정렬된 새로운 배열을 반환함
-    const sortedData = monthFilter.toSorted((a, b) =>
+    // 날짜 비교하여 최신순, 오래된순으로 정렬, toSorted -> 원본 배열 보존 정렬
+    const sortedData = monthFilter?.toSorted((a, b) =>
       sortType === "oldest"
         ? new Date(a.date) - new Date(b.date)
         : new Date(b.date) - new Date(a.date)
@@ -48,31 +49,33 @@ const ExpensesList = () => {
     return { totalExpenses, sortedData };
   };
 
+  const { totalExpenses, sortedData } = getfilteredData();
+
   // 최신순, 오래된순 옵션 select선택 시
   const onChangeSort = (e) => {
     setSortType(e.target.value);
   };
 
-  const { totalExpenses, sortedData } = getfilteredData();
-
   useEffect(() => {
-    // N월 꺼내기
     const localSelectMonth = JSON.parse(
       localStorage.getItem("selectMonth")
     );
 
-    // 지출 데이터 꺼내기
-    const localExpData = JSON.parse(localStorage.getItem("expenses"));
-
     dispatch(totalMonthExpense(localSelectMonth));
-    dispatch(displayExpense(localExpData));
   }, []);
+
+  const loadingOrErrorComponent = useLoadingError(
+    isFetchingExpenses,
+    isErrorExpenses,
+    "데이터를 불러오는 중 에러가 발생했습니다."
+  );
+  if (loadingOrErrorComponent) return loadingOrErrorComponent;
 
   return (
     <>
       <TotalExpensesDiv>
         <h2>
-          {totalMonth}월 총 지출 :{" "}
+          {totalMonth && totalMonth}월 총 지출 :{" "}
           {totalExpenses.toLocaleString("ko-KR")}원
         </h2>
       </TotalExpensesDiv>

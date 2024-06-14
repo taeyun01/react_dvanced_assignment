@@ -1,20 +1,30 @@
-import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 
-const ExpensesItem = ({ id, date, item, amount, description }) => {
-  const nav = useNavigate();
+const ExpensesItem = ({
+  id,
+  date,
+  item,
+  amount,
+  description,
+  userName,
+}) => {
+  const navigate = useNavigate();
 
   const detailPageMove = (id) => {
-    nav(`/detail/${id}`);
+    navigate(`/detail/${id}`);
   };
 
   return (
     <>
+      {userName ? (
+        <StUserName>{`"${userName}"님의 지출`}</StUserName>
+      ) : (
+        "사용자 없음"
+      )}
       <ExpensesItemtLi onClick={() => detailPageMove(id)}>
         <ItemtDiv>
-          <p>{date}</p>
+          <p>{date} </p>
           <ItemtP>
             {item} - {description}
           </ItemtP>
@@ -64,4 +74,7 @@ const ItemtP = styled.p`
   text-overflow: ellipsis;
 `;
 
+const StUserName = styled.span`
+  color: #8b8b8b;
+`;
 export default ExpensesItem;

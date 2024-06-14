@@ -2,7 +2,7 @@
 
 - (완료) slice 에서 action creator 를 작명하실 때 createReducer 라고 작명하시기보다는 createExpense 처럼 어떤 의도로 상태를 변경할지를 보다 semantic 하게 작명해주시는 것을 권장 드립니다.
 
-- (미완료) - useEffect(() => {
+- (완료) - useEffect(() => {
   // N월 가져오기
   const selectMonth = JSON.parse(
   localStorage.getItem("selectMonth")

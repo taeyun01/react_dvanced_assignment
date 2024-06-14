@@ -1,0 +1,155 @@
+{
+  "expenses": [
+    {
+      "id": "dee9",
+      "date": "2024-06-06",
+      "item": "111",
+      "amount": "111",
+      "description": "111",
+      "userId": "test444",
+      "userName": "크오앙"
+    },
+    {
+      "id": "426a",
+      "date": "2024-06-06",
+      "item": "222",
+      "amount": "222",
+      "description": "222",
+      "userId": "test444",
+      "userName": "크오앙"
+    },
+    {
+      "id": "8059",
+      "date": "2024-06-13",
+      "item": "444",
+      "amount": "44",
+      "description": "444",
+      "userId": "test444",
+      "userName": "크오앙"
+    },
+    {
+      "id": "2614",
+      "date": "2024-06-07",
+      "item": "333",
+      "amount": "333",
+      "description": "333",
+      "userId": "test444",
+      "userName": "크오앙"
+    },
+    {
+      "id": "0188",
+      "date": "2024-06-13",
+      "item": "222",
+      "amount": "222",
+      "description": "222",
+      "userId": "test123123",
+      "userName": "삼겹살"
+    },
+    {
+      "id": "01f4",
+      "date": "2024-06-13",
+      "item": "3322",
+      "amount": "33322",
+      "description": "3322",
+      "userId": "test123123",
+      "userName": "삼겹살"
+    },
+    {
+      "id": "ce6a",
+      "date": "2024-01-01",
+      "item": "3231",
+      "amount": "321321",
+      "description": "321312",
+      "userId": "test123123",
+      "userName": "삼겹살"
+    },
+    {
+      "id": "e6e2",
+      "date": "2024-01-03",
+      "item": "음료",
+      "amount": "23000",
+      "description": "캔커피 1박스",
+      "userId": "test444",
+      "userName": "지출왕"
+    },
+    {
+      "id": "31cb",
+      "date": "2024-01-16",
+      "item": "식비",
+      "amount": "9000",
+      "description": "돼지국밥",
+      "userId": "test123123",
+      "userName": "식신"
+    },
+    {
+      "id": "338a",
+      "date": "2024-06-03",
+      "item": "112",
+      "amount": "112",
+      "description": "112",
+      "userName": "새로가입"
+    }
+  ],
+  "userInfo": [
+    {
+      "id": "ece2",
+      "data": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QxMjMxMjMiLCJpYXQiOjE3MTgyNTM5MTMsImV4cCI6MTcxODI1NzUxM30.IBzpBeDvV-iTvWY-eXgmY1vEkA3-HF9iVp9IsocspYE",
+        "userId": "test123123",
+        "success": true,
+        "avatar": null,
+        "nickname": "헤헤헤"
+      }
+    }
+  ],
+  "month": [
+    {
+      "number": "1",
+      "id": "a23d"
+    },
+    {
+      "number": "2",
+      "id": "9517"
+    },
+    {
+      "number": "3",
+      "id": "008a"
+    },
+    {
+      "number": "4",
+      "id": "2613"
+    },
+    {
+      "number": "5",
+      "id": "8781"
+    },
+    {
+      "number": "6",
+      "id": "b3ed"
+    },
+    {
+      "number": "7",
+      "id": "8601"
+    },
+    {
+      "number": "8",
+      "id": "4d6c"
+    },
+    {
+      "number": "9",
+      "id": "b585"
+    },
+    {
+      "number": "10",
+      "id": "70d0"
+    },
+    {
+      "number": "11",
+      "id": "0469"
+    },
+    {
+      "number": "12",
+      "id": "7732"
+    }
+  ]
+}

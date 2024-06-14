@@ -1,70 +1,90 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  deleteExpense,
-  editExpense,
-} from "../redux/slices/expensesSlice";
+import { useSelector } from "react-redux";
+import { jsonApi } from "../api/axios";
+import useLoadingError from "../hooks/useLoadingError";
+import useApiQuery from "../hooks/useApiQuery";
 
 const Detail = () => {
-  const { expenses } = useSelector((state) => state.expenses); // N월 데이터
+  const { userInfo } = useSelector((state) => state.expenses);
 
-  const dispatch = useDispatch();
+  const {
+    data: expenses,
+    isPending: isFetchingExpenses,
+    isError: isErrorExpenses,
+  } = useApiQuery("expenses", "/expenses");
 
   const { id } = useParams();
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const dateRef = useRef("");
   const itemRef = useRef("");
   const amountRef = useRef("");
   const descriptionRef = useRef("");
 
-  const onClickEdit = () => {
+  const onClickEdit = async () => {
     if (window.confirm("수정 하시겠습니까?")) {
-      dispatch(
-        editExpense({
-          id,
-          date: dateRef.current.value,
-          item: itemRef.current.value,
-          amount: amountRef.current.value,
-          description: descriptionRef.current.value,
-        })
-      );
-
-      nav("/");
+      const editExpenses = {
+        id,
+        date: dateRef.current.value,
+        item: itemRef.current.value,
+        amount: amountRef.current.value,
+        description: descriptionRef.current.value,
+      };
+      await jsonApi.patch(`/expenses/${id}`, editExpenses);
+      navigate("/");
     }
   };
 
-  const onClickDelete = () => {
+  const onClickDelete = async () => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
-      dispatch(
-        deleteExpense({
-          id,
-        })
-      );
-
-      // 삭제한 페이지로 이동 안되게 뒤로가기 차단
-      nav("/", { replace: true });
+      await jsonApi.delete(`/expenses/${id}`);
+      navigate("/", { replace: true });
     }
   };
-  const onClickGoBack = () => {
-    nav(-1);
-  };
 
-  // 항목 아이템 클릭한 id와 expenses의 id값이랑 같은거 가져오기
-  const detailFilter = expenses.find((exp) => exp.id === id);
-  const { date, item, amount, description } = detailFilter;
+  // 항목 아이템 클릭한 id와 expenses의 id 값이랑 같은거 가져오기
+  const detailFilter = expenses?.filter((exp) => exp.id === id)[0];
+  const { date, item, amount, description, userId } = detailFilter;
 
-  // detail페이지 이동시 아이템 텍스트 화면에 출력
   useEffect(() => {
+    if (!userInfo) {
+      alert("사용자 정보를 불러올 수 없습니다.");
+      navigate("/");
+      return;
+    }
+
+    if (userId !== userInfo.userId && userId !== userInfo.id) {
+      alert("본인이 작성한 내역만 수정할 수 있습니다.");
+      navigate("/");
+      return;
+    }
+
     dateRef.current.value = date;
     itemRef.current.value = item;
     amountRef.current.value = amount;
     descriptionRef.current.value = description;
-  }, []);
+  }, [expenses, navigate, userInfo]);
+
+  const loadingOrErrorComponent = useLoadingError(
+    isFetchingExpenses,
+    isErrorExpenses,
+    "데이터를 불러오는 중 에러가 발생했습니다."
+  );
+
+  if (loadingOrErrorComponent) return loadingOrErrorComponent;
+
+  if (!userInfo) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <DetailContainer>
+      <StyledUserInfo>
+        {userInfo
+          ? `"${userInfo.nickname}"님의 지출내역 수정`
+          : "Loading..."}
+      </StyledUserInfo>
       <DtailBox>
         <InputBox>
           <label htmlFor="date">날짜</label>
@@ -120,7 +140,7 @@ const Detail = () => {
           <Button
             $color={"#c5c5c5"}
             $hover={"#b8b4b4"}
-            onClick={onClickGoBack}
+            onClick={() => navigate(-1)}
           >
             뒤로가기
           </Button>
@@ -183,4 +203,9 @@ const Button = styled.button`
     background-color: ${(props) => props.$hover};
   }
 `;
+
+const StyledUserInfo = styled.p`
+  margin: 10px;
+`;
+
 export default Detail;

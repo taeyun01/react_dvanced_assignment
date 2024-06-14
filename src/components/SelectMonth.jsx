@@ -1,28 +1,41 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { totalMonthExpense } from "../redux/slices/expensesSlice";
+import useApiQuery from "../hooks/useApiQuery";
+import useLoadingError from "../hooks/useLoadingError";
 
 const SelectMonth = () => {
-  const { month } = useSelector((state) => state.expenses); // 월 데이터
-  const dispatch = useDispatch();
   const [activeIndex, setActiveIndex] = useState(null);
+  const dispatch = useDispatch();
 
-  // 1월~12월 버튼 클릭시 실행
-  const selectMonthActive = (id) => {
+  const {
+    data: month,
+    isPending: isFetchingMonth,
+    isError: isErrorMonth,
+  } = useApiQuery("month", "/month");
+
+  // 1월~12월 버튼 클릭시
+  const selectMonthActive = async (id) => {
     setActiveIndex(id);
     dispatch(totalMonthExpense(id));
     localStorage.setItem("selectMonth", JSON.stringify(id));
   };
 
-  // 새로고침시 버튼 활성화 유지
+  // 월 버튼 활성화 유지
   useEffect(() => {
-    // N월 가져오기
     const selectMonth = JSON.parse(
       localStorage.getItem("selectMonth")
     );
     setActiveIndex(selectMonth);
   }, []);
+
+  const loadingOrErrorComponent = useLoadingError(
+    isFetchingMonth,
+    isErrorMonth,
+    "데이터를 불러오는 중 에러가 발생했습니다."
+  );
+  if (loadingOrErrorComponent) return loadingOrErrorComponent;
 
   return (
     <div>
@@ -30,7 +43,7 @@ const SelectMonth = () => {
         {month.map((mon) => (
           <MonthItemDiv
             key={mon.number}
-            $active={activeIndex === mon.number}
+            $active={+activeIndex === +mon.number}
             onClick={() => selectMonthActive(mon.number)}
           >
             {mon.number}월

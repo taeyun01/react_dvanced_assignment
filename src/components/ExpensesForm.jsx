@@ -1,17 +1,35 @@
-import React, { useState } from "react";
+import { useContext, useState } from "react";
 import styled from "styled-components";
-import { v4 as uuidv4 } from "uuid";
-import { useDispatch } from "react-redux";
-import { createExpense } from "../redux/slices/expensesSlice";
+import { useSelector } from "react-redux";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { jsonApi } from "../api/axios";
 
 const ExpensesForm = () => {
-  const dispatch = useDispatch();
-
   const [input, setInput] = useState({
     date: "",
     item: "",
     amount: "",
     description: "",
+  });
+
+  // const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.expenses);
+  const { isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
+
+  const addTodo = async (newTodo) => {
+    await jsonApi.post(`/expenses`, newTodo);
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: addTodo,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["expenses"]); // queryKey가 유효하지 않을때는(item이 늘어나거나 줄어들 때) invalidateQueries고 반드시 queryKey를 넣어줘야함
+    },
   });
 
   const onChange = (e) => {
@@ -21,11 +39,15 @@ const ExpensesForm = () => {
     });
   };
 
-  // 인풋 입력 후 저장버튼 클릭 시 실행
   const createExpenses = (e) => {
     e.preventDefault();
 
-    // 유효성 검사
+    if (!isAuthenticated) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
     if (
       input.date === "" ||
       input.item === "" ||
@@ -35,16 +57,16 @@ const ExpensesForm = () => {
       return alert("내용을 모두 입력해주세요!");
     }
 
-    // 지출내역 생성 action 전달
-    dispatch(
-      createExpense({
-        id: uuidv4(),
-        date: input.date,
-        item: input.item,
-        amount: input.amount,
-        description: input.description,
-      })
-    );
+    const newExpenses = {
+      date: input.date,
+      item: input.item,
+      amount: input.amount,
+      description: input.description,
+      userId: userInfo.id,
+      userName: userInfo.nickname,
+    };
+
+    mutate(newExpenses);
 
     setInput({
       ...input,
